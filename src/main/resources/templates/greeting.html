@@ -1,0 +1,19 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head> 
+    <title>Getting Started: Serving Web Content</title> 
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style>
+        body{
+            background-color: darkolivegreen;
+            text-align: center;
+            }
+    </style>
+</head>
+<body>
+    
+    <p th:text="|Hello, ${name}!|"></p><br>
+    <p th:text="|You chose the color ${pagecolor}|" th:style="|background-color:${pagecolor};|"></p>
+
+</body>
+</html>

@@ -1,0 +1,15 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+       <title>Something went wrong</title>
+       <link rel="stylesheet" th:href="@{/DefaultStyle.css}">
+    </head>
+    <body>
+        <h1>
+            Something went wrong with our app! We're very sorry.
+        </h1><br>
+        <h1 th:text="|Status: ${status}|"></h1><br>
+        <p th:text="|Message: ${message}|"></p>
+        <a href="/">Return to Index</a>
+    </body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE HTML>
+<html>
+<head> 
+    <title>Getting Started: Serving Web Content</title> 
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    
+</head>
+<body>
+    <p>Get your greeting <a href="/greeting">here</a></p>
+    <form action="/greeting" method="post">
+        <label for = "nameForGreeting"> Your Name</label><br>
+        <input type = "text" title = "name" name="name" id="nameForGreeting" placeholder="Your Name"/><br>
+        <select id = "pagecolorSelect" name="pagecolor">
+            <option value="Cornsilk" selected="selected">Cornsilk</option>
+            <option value="DarkSlateGrey">Dark Slate Grey</option>
+            <option value="Gainsboro">Gainsboro</option>
+            <option value="GoldenRod">Goldenrod</option>
+            <option value="Indigo">Indigo</option>
+            <option value="MidnightBlue">MidnightBlue</option>
+        </select><br>
+        <button type = "submit"> Better Greeting</button>
+    </form>
+
+    <h3><a name = "linkForLogin" href="/login">Login Page</a></h3>
+
+    <h3><a name = "linkForRegister" href="/register">Register</a></h3>
+
+</body>
+<script>
+    let loginLink = "/login";
+    let registerLink = "/login";
+    const loginElement = document.getElementsByName("linkForLogin")[0];
+    const registerElement = document.getElementsByName("linkForRegister")[0];
+    document.getElementById("pagecolorSelect").addEventListener("change",setPageColor)
+
+    function setPageColor(){
+        let pagecolorSelect = document.getElementById("pagecolorSelect");
+        let pagecolorSelectValue = pagecolorSelect.value;
+        loginLink = "/login?pagecolor=" + pagecolorSelectValue;
+        registerLink = "/register?pagecolor=" + pagecolorSelectValue;
+        loginElement.setAttribute("href" , loginLink);
+        registerElement.setAttribute("href" , registerLink);
+        document.body.style.backgroundColor = pagecolorSelectValue;
+    }
+    setPageColor();
+    
+</script>
+<!-- <script src="HelloWorld.js"></script> -->
+</html>
