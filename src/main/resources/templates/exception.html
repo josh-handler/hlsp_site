@@ -4,7 +4,8 @@
        <title>Something went wrong</title>
        <link rel="stylesheet" th:href="@{/DefaultStyle.css}">
     </head>
-    <body>
+    <body class="bg-greenish">
+        <div th:replace="~{fragments/navbarfragment :: navbar}"></div>
         <h1>
             Something went wrong with our app! We're very sorry.
         </h1><br>

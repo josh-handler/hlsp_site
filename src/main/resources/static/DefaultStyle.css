@@ -1,9 +1,22 @@
 
 .jumbotron {
-  background-color: #f4511e; /* Orange */
+  background-color: #6898f1; /* Orange */
   color: #ffffff;
 }
 
 .bg-grey {
-    background-color: #f6f6f6;
+    background-color: #acacac;
   }
+
+.bg-greenish{
+  background-color: rgb(44, 106, 31);
+  color: #ffffffee;
+}
+
+.bg-orange{
+  background-color: #ED7D31;
+}
+
+.text-white{
+  color: #ffffff;
+}

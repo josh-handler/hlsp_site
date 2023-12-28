@@ -11,9 +11,8 @@
     </style>
 </head>
 <body>
-    
+    <div th:replace="~{fragments/navbarfragment :: navbar}"></div>
     <p th:text="|Hello, ${name}!|"></p><br>
     <p th:text="|You chose the color ${pagecolor}|" th:style="|background-color:${pagecolor};|"></p>
-
 </body>
 </html>
