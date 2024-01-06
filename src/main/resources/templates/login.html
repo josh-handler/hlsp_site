@@ -6,27 +6,31 @@
     <title>Login</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link th:href="@{https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css}" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <link rel="stylesheet" th:href="@{/DefaultStyle.css}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">    <link rel="stylesheet" th:href="@{/DefaultStyle.css}">
 </head>
-<body id="mainBody">
-    <!-- <object type="text/html" data="navBar.html"></object> -->
-    <div class="jumbotron text-center">
-        <h2 th:text="${firstName}?:'Try Logging In'|"></h2>
+<body class="bg-greenish">
+    <th:block th:switch="${loginStatus}">
+        <th:block th:case="'out'">
+            <div th:replace="~{fragments/navbarfragment :: navbarOut}"></div>
+        </th:block>
+        <th:block th:case="'in'">
+            <div th:replace="~{fragments/navbarfragment :: navbarIn}"></div>
+        </th:block>
+    </th:block>
+            <!-- <h2 th:text="${firstName}?:'Try Logging In'|"></h2> -->
         <!-- "*{age}?: '(no age specified)'" -->
-    </div>
     <div class="container-fluid">
         <div class="row justify-content-center">
             <div class="col-5 bg-grey px-5 pt-1">
                 <h3 class="text-center">Login</h3>
                     <form class="form-signin" action="/loginRequest" method="post">
                         <div class="form-group pt-1 text-center">
-                            <label for="userName">Username</label><br>
-                            <input class="w-50" type = text name="userName" title="Username" placeholder="Username">
+                            <label for="email">Email Address</label><br>
+                            <input required class="w-50" type = text name="email" title="Email Address" placeholder="Email Address">
                         </div>
                         <div class="form-group pt-1 text-center">
                             <label for="password">Password</label><br>
-                            <input class="w-50" type="password" name="password" title="Password" placeholder="Password">
+                            <input required class="w-50" type="password" name="password" title="Password" placeholder="Password">
                         </div>
                         <div class="input-group-btn py-2">
                             <div class="row">
@@ -41,11 +45,11 @@
             </div>
         </div>
     </div>
-    <script th:inline="javascript">
+    <!-- <script th:inline="javascript">
         var pagecolor = /*[[${pagecolor}]]*/ "indigo";
         document.body.style.backgroundColor = pagecolor;
-    </script>
+    </script> -->
     <!--Bootstrap Javascript Requirements-->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
 </html>

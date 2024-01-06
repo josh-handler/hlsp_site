@@ -15,8 +15,11 @@ public interface SiteUserRepository extends CrudRepository<SiteUser, Integer> {
     List<SiteUser> logInAsUser(String emailAddress, byte[] passwordHash);
 
     @Query("SELECT user.emailAddress FROM SiteUser user WHERE user.emailAddress = :emailAddress")
-    List<String> checkIfEmailIsUsed(String emailAddress);
+    List<String> getUsersEmailByEmail(String emailAddress);
 
     @Query("Select user.salt FROM SiteUser user WHERE user.emailAddress = :emailAddress")
     List<byte[]> getSaltForLogin(String emailAddress);
+
+    @Query("SELECT user FROM SiteUser user WHERE user.emailAddress = :emailAddress")
+    List<SiteUser> getUserDetailsByEmail(String emailAddress);
 }

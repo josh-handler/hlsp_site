@@ -33,7 +33,7 @@ public class SiteUser {
     }
 
     public User toUser(){
-        return new User(userId,emailAddress,firstName,lastName,displayName);
+        return new User(userId,emailAddress,firstName,lastName, displayName);
     }
 
     public byte[] getSalt() {

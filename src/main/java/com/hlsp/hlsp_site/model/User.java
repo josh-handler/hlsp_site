@@ -1,14 +1,24 @@
 package com.hlsp.hlsp_site.model;
 
+import java.io.Serializable;
+
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class User {
+public class User implements Serializable {
     private int userID;
     private String email;
     private String firstName;
     private String lastName;
     private String displayName;
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
 
     public int getUserID() {
         return userID;
@@ -40,14 +50,6 @@ public class User {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
     }
 
     public User(){

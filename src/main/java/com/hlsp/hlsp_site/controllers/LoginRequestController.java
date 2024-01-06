@@ -21,6 +21,8 @@ import com.hlsp.hlsp_site.model.SiteUser;
 import com.hlsp.hlsp_site.model.User;
 import com.hlsp.hlsp_site.repository.SiteUserRepository;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 
@@ -34,19 +36,19 @@ public class LoginRequestController {
     // public static final String LOGIN_SUCCESS_VIEW_NAME = "loginSuccess";
     // public static final String LOGIN_FAIL_VIEW_NAME = "loginFailureBadCredentialsOrSqlIssue";
     // public static final String INVALID_DATA_VIEW_NAME = "loginFailureInvalidData";
-    public static final String LOGIN_SUCCESS_VIEW_NAME = "loginSuccess";
+    public static final String LOGIN_SUCCESS_VIEW_NAME = "index";
     public static final String LOGIN_FAIL_VIEW_NAME = "exception";
     public static final String INVALID_DATA_VIEW_NAME = "exception";
 
     @PostMapping("/loginRequest")
-    public ModelAndView postLoginRequest(@RequestParam(name="userName", required=true) String userName, 
-    @RequestParam(name="password", required=true) String password, HttpSession session){
+    public ModelAndView postLoginRequest(@RequestParam(name="email", required=true) String email, 
+    @RequestParam(name="password", required=true) String password, HttpSession session, HttpServletResponse response){
 
         Map<String, Object> model = new HashMap<>();
-        if(validLoginDataStructure(userName,password)){
+        if(validLoginDataStructure(email,password)){
             User user = null;
             try{
-                user = loginAttempt(userName, password);
+                user = loginAttempt(email, password);
             }
             catch(SQLException | NoSuchAlgorithmException loginAttemptException){
                 model.put("exception", loginAttemptException);
@@ -54,14 +56,25 @@ public class LoginRequestController {
                 // return LOGIN_FAIL_VIEW_NAME;
             }
         
-        if(user!=null)
-        session.setAttribute("user", user);
+            if(user!=null){
+            session.setAttribute("user", user);
 
-        model.put("sessionType", session.getClass().getName());
-        model.put("userName", user.getEmail());
-        model.put("firstName", user.getFirstName());
+            Cookie emailCookie = new Cookie("email", user.getEmail());
+            emailCookie.setPath("/");
+            response.addCookie(emailCookie);
 
-        return new ModelAndView(LOGIN_SUCCESS_VIEW_NAME, model);
+            Cookie displayNameCookie = new Cookie("displayName", user.getDisplayName());
+            displayNameCookie.setPath("/");
+            response.addCookie(displayNameCookie); 
+
+            Cookie loginStatusCookie = new Cookie("loginStatus", "in");
+            loginStatusCookie.setPath("/");
+            response.addCookie(loginStatusCookie);
+
+            model.put("loginStatus", "in");
+
+            return new ModelAndView("redirect:/" + LOGIN_SUCCESS_VIEW_NAME, model);
+            }
         }
         
         return new ModelAndView(INVALID_DATA_VIEW_NAME, model);
@@ -90,6 +103,8 @@ public class LoginRequestController {
             throw new SQLException("Something went wrong on our end", e);
         }
 
+        //Retrieve the user, ensure that there is only 1 response
+
         List<SiteUser> resultSetSiteUsers = siteUserRepository.logInAsUser(userName, hash);
         
         if(resultSetSiteUsers.isEmpty()){
@@ -108,11 +123,6 @@ public class LoginRequestController {
 
     public Boolean validLoginDataStructure(String userName, String password){
         return true;
-    }
-
-    @GetMapping("/loginRequest")
-    public String getLoginRequest(){
-        return "navBar";
     }
 }
 

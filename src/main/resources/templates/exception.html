@@ -5,7 +5,14 @@
        <link rel="stylesheet" th:href="@{/DefaultStyle.css}">
     </head>
     <body class="bg-greenish">
-        <div th:replace="~{fragments/navbarfragment :: navbar}"></div>
+        <th:block th:switch="${loginStatus}">
+            <th:block th:case="'out'">
+                <div th:replace="~{fragments/navbarfragment :: navbarOut}"></div>
+            </th:block>
+            <th:block th:case="'in'">
+                <div th:replace="~{fragments/navbarfragment :: navbarIn}"></div>
+            </th:block>
+        </th:block>
         <h1>
             Something went wrong with our app! We're very sorry.
         </h1><br>

@@ -23,7 +23,7 @@ public class ErrorHandler implements ErrorController  {
     public ModelAndView defaultErrorHandler(NoHandlerFoundException exception){ 
         Map<String, Object> model = new HashMap<>();
         model.put("status", HttpStatus.INTERNAL_SERVER_ERROR);
-        model.put("body", exception.getMessage());
+        model.put("message", exception.getMessage());
         return new ModelAndView(DEFAULT_ERROR_VIEW, model);
     }
 
