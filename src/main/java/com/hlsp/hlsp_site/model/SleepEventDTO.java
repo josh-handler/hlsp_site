@@ -1,9 +1,5 @@
 package com.hlsp.hlsp_site.model;
 
-import java.util.Date;
-
-import io.micrometer.common.lang.NonNull;
-
 public class SleepEventDTO{
     private String sleepEventDate;
 

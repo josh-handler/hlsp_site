@@ -1,13 +1,10 @@
 package com.hlsp.hlsp_site.controllers;
 
-import java.net.http.HttpResponse;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -25,7 +22,6 @@ import com.hlsp.hlsp_site.repository.SiteUserRepository;
 import com.hlsp.hlsp_site.repository.SleepEventRepository;
 
 import jakarta.servlet.http.HttpSession;
-import jakarta.websocket.SessionException;
 
 @Controller
 public class SleepController {
@@ -37,24 +33,42 @@ public class SleepController {
 
     @GetMapping("/sleep")
     public String sleepGet(@CookieValue(name="loginStatus", defaultValue="out") String loginStatus, 
-    @CookieValue(name="displayName", defaultValue="") String displayName,Model model){
-        model.addAttribute("loginStatus", loginStatus);
-        if(loginStatus.equals("in")){
-            model.addAttribute("displayName", displayName);
+        @CookieValue(name="displayName", defaultValue="") String displayName,Model model,
+        HttpSession session){
+
+        User userDto = (User) session.getAttribute("user");
+
+        if(userDto==null){
+            model.addAttribute("loginStatus", "out");
+            return "login";
         }
+
+        model.addAttribute("loginStatus", loginStatus);
+        model.addAttribute("displayName", displayName);
         return "sleep";
     }
 
     @GetMapping("/sleepTable")
     public ResponseEntity<List<SleepEventDTO>> getSleepTable(HttpSession session){
-        User user = (User) session.getAttribute("user");
+        User userDto = (User) session.getAttribute("user");
 
-        List<SleepEvent> sleepEvents = sleepEventRepository.findBySiteUserUserId(user.getUserID());
+        if(userDto==null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        List<SleepEvent> sleepEvents = sleepEventRepository.findBySiteUserUserId(userDto.getUserID());
         List<SleepEventDTO> sleepEventDtos = new ArrayList<SleepEventDTO>();
 
         for(SleepEvent event : sleepEvents){
             sleepEventDtos.add(event.createDto());
         }
+
+        //This sorts the sleep events. First by date, then by time "to bed."
+        //Users thus have a (more) consistent experience of the data
+        sleepEventDtos.sort(
+            Comparator.comparing(SleepEventDTO::getSleepEventDate)
+            .thenComparing(SleepEventDTO::getToBedTime));
+
 
         ResponseEntity<List<SleepEventDTO>> responseEntity = ResponseEntity.ok(sleepEventDtos);
         return responseEntity;
@@ -84,6 +98,8 @@ public class SleepController {
 
         SleepEvent createdSleepEvent = sleepEventRepository.save(receivedSleepEvent);
 
+        //This does not sort the new data into the correct row of the table on the client side
+        //but this is a compromise for users knowing the data is in without additional work.
         return new ResponseEntity<>(createdSleepEvent.createDto(), HttpStatus.CREATED);
      }
 }
