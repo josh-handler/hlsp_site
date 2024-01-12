@@ -19,6 +19,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.hlsp.hlsp_site.model.SiteUser;
 import com.hlsp.hlsp_site.model.User;
 import com.hlsp.hlsp_site.repository.SiteUserRepository;
+import com.hlsp.hlsp_site.support.CustomPasswordEncoder;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -44,16 +45,12 @@ public class RegisterRequestController {
             return new ModelAndView("exception", model);
         }
         
-        SecureRandom saltShaker = new SecureRandom();    
-        byte[] salt = new byte[16];
-        saltShaker.nextBytes(salt);
+        CustomPasswordEncoder encoder = new CustomPasswordEncoder();
 
-        byte[] hash = new byte[16];
+        encoder.saltAndHash(password);
 
-        KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 128);
-        try{
-        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-        hash = factory.generateSecret(spec).getEncoded();
+        byte[] salt = encoder.getSalt();
+        byte[] hash = encoder.getHash();
         
         if(!siteUserRepository.getUsersEmailByEmail(email).isEmpty()){
             model.put("message",  "Email is already associated with an account");
@@ -62,6 +59,7 @@ public class RegisterRequestController {
         } 
 
         SiteUser siteUserToRegister = new SiteUser(firstName, lastName, email, hash, salt);
+
 
         siteUserToRegister.setDisplayName(firstName);
 
@@ -81,23 +79,10 @@ public class RegisterRequestController {
         loginStatusCookie.setPath("/");
         response.addCookie(loginStatusCookie);
 
-        }catch(NoSuchAlgorithmException exception){
-            model.put("status", HttpStatus.INTERNAL_SERVER_ERROR);
-            model.put("message", exception.getMessage());
-            return new ModelAndView("exception", model);
-        }catch(InvalidKeySpecException exception){
-            model.put("status", HttpStatus.INTERNAL_SERVER_ERROR);
-            model.put("message", exception.getMessage());
-            return new ModelAndView("exception", model);
-        }
-        // return "registrationSuccess";
-
-        //Succesful registration, add loginStatus = in ?and ensure User is instantiated?, return landing page
-       
-        
-        
-
         model.put("loginStatus", "in");
+
+        session.setAttribute("user", user);
+
         return new ModelAndView("redirect:/index", model);
     }
 }

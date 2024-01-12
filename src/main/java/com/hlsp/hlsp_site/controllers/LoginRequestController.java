@@ -20,6 +20,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.hlsp.hlsp_site.model.SiteUser;
 import com.hlsp.hlsp_site.model.User;
 import com.hlsp.hlsp_site.repository.SiteUserRepository;
+import com.hlsp.hlsp_site.support.CustomPasswordEncoder;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -73,6 +74,8 @@ public class LoginRequestController {
 
             model.put("loginStatus", "in");
 
+            session.setAttribute("user", user);
+
             return new ModelAndView("redirect:/" + LOGIN_SUCCESS_VIEW_NAME, model);
             }
         }
@@ -92,17 +95,12 @@ public class LoginRequestController {
             throw new SQLException("Wrong email or password -1");
 
         byte[] salt = resultSetSiteSalts.get(0);
-        byte[] hash = new byte[16];
-
-        KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 128);
-        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
         
-        try{
-        hash = factory.generateSecret(spec).getEncoded();       
-        }catch(InvalidKeySpecException e){
-            throw new SQLException("Something went wrong on our end", e);
-        }
+        CustomPasswordEncoder encoder = new CustomPasswordEncoder();
+        encoder.setSalt(salt);
+        encoder.hashWithCurrentSalt(password);
 
+        byte[] hash = encoder.getHash();
         //Retrieve the user, ensure that there is only 1 response
 
         List<SiteUser> resultSetSiteUsers = siteUserRepository.logInAsUser(userName, hash);

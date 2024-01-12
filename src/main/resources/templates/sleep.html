@@ -15,33 +15,149 @@
             <div th:replace="~{fragments/navbarfragment :: navbarIn}"></div>
         </th:block>
     </th:block>
-
-    <div id="sleepFormArea"></div>
-    <div id="sleepInfoArea">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">Date</th>
-                    <th scope="col">Went to bed</th>
-                    <th scope="col">Fell Asleep (optional)</th>
-                    <th scope="col">Woke up (optional)</th>
-                    <th scope="col">Got out of bed</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th scope="row">01/01/1970</th>
-                    <td>23:00</td>
-                    <td>23:22</td>
-                    <td>07:28</td>
-                    <td>08:11</td>
-                </tr>
-            </tbody>
-        </table>
+    <h2 class="text-center">My Sleep Data</h2>
+    <button id="sleepFormAreaVisibleButton">Add a night's sleep</button>
+    <div id="sleepFormArea" class="d-none">
+        <div class="d-flex justify-content-center mb-3">
+            <div></div>
+            <form id="sleepPostForm" class="col-6" action="/sleepForm" method="post">
+                <div class="row mb-1">
+                    <div class="col-6 d-flex justify-content-end">
+                        <label class="me-2" for="date">Date </label><br>
+                        <input id="formDate" required type ="date" name="date" title="Date">
+                    </div>
+                </div>
+                <div class="row mb-1">
+                    <div class="col d-flex justify-content-end">
+                        <label class="me-2" for="toBed">Went to bed at</label>
+                        <input id="formToBed" required type ="time" name="toBed" title="Went to bed">
+                    </div>
+                    <div class="col d-flex justify-content-end">
+                        <label class="me-2" for="toSleep">Fell Asleep at (Optional)</label>
+                        <input id="formToSleep" type ="time" name="toSleep" title="Fell Asleep">
+                        </div>
+                </div>
+                <div class="row mb-1">
+                    <div class="col d-flex justify-content-end">
+                        <label class="me-2" for="gotUp">Got out of bed at</label>
+                        <input id="formGotUp" type ="time" name="gotUp" title="Got out of bed">
+                    </div>
+                    <div class="col d-flex justify-content-end">
+                        <label class="me-2" for="wokeUp">Woke Up at (Optional)</label>
+                        <input id="formWokeUp" type ="time" name="wokeUp" title="Woke Up">
+                    </div> 
+                </div>
+                <div class="d-flex mt-1 justify-content-end">
+                    <button class="btn btn-warning" type="submit">Submit</button>
+                </div>
+            </form>
+            <div></div>
+        </div>
     </div>
-
+    <div class="d-flex justify-content-center mb-3">
+        <div></div>
+        <div id="sleepInfoArea" class="table-responsive">
+                <table class="table table-bordered" id="sleepTable">
+                <thead>
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Went to bed</th>
+                        <th scope="col">Fell Asleep (optional)</th>
+                        <th scope="col">Woke up (optional)</th>
+                        <th scope="col">Got out of bed</th>
+                    </tr>
+                </thead>
+                <tbody id="sleepTableBody">
+                </tbody>
+            </table>
+        </div>
+        <div></div>
+    </div>
 </body>
 <script>
+    document.getElementById("formDate").setAttribute("value",new Date().toISOString().substr(0, 10))
+    
+    function addToSleepTable(sleepEvent){
+        let sleepTime = "";
+        if(sleepEvent.fellAsleepTime!== null){
+            sleepTime=sleepEvent.fellAsleepTime;
+        }
+        let upTime = "";
+        if(sleepEvent.wokeUpTime!== null){
+            upTime=sleepEvent.wokeUpTime;
+        }
+            let newRow = sleepTable.insertRow(1)
+            newRow.innerHTML = `
+            <tr>
+                <th scope="row">${sleepEvent.sleepEventDate}</th>
+                <td>${sleepEvent.toBedTime}</td>
+                <td>${sleepTime}</td>
+                <td>${upTime}</td>
+                <td>${sleepEvent.gotUpTime}</td>
+            </tr>
+            `
+        }
+        
+    document.addEventListener('DOMContentLoaded', function() {
+   // everything else we type will go inside this!!  
+        var responseAsJson;
+        const sleepTable = document.getElementById('sleepTableBody');
+        fetch('sleepTable').then( response => response.json())
+        .then(sleepEventData => {
+                for(let i in sleepEventData){
+                    addToSleepTable(sleepEventData[i]);
+                }
+            }
+        )
+    })
+    
+
+    var formHidden = true;
+
+    const sleepPostForm = document.getElementById('sleepPostForm');
+    sleepPostForm.addEventListener('submit', (event) => {
+        event.preventDefault()
+
+        let sleepDateInput = document.getElementById('formDate').value
+        let toBedInput = document.getElementById('formToBed').value
+        let toSleepInput = document.getElementById('formToSleep').value
+        let gotUpInput = document.getElementById('formGotUp').value
+        let wokeUpInput = document.getElementById('formWokeUp').value
+
+        fetch('/sleepForm',{
+            method: 'POST',
+            body: JSON.stringify({
+                    sleepEventDate: sleepDateInput,
+                    toBedTime: toBedInput,
+                    fellAsleepTime: toSleepInput,
+                    wokeUpTime: wokeUpInput,
+                    gotUpTime: gotUpInput
+                }),
+            headers: {'Content-Type': 'application/json'}
+        })
+        .then(response => response.json())
+        .then(sleepEvent => {
+            addToSleepTable(sleepEvent)
+        });
+    });
+
+    //Add eventlistener to allow a button to trigger the showSleepFormArea event
+    const sleepFormAreaVisibleButton = document.getElementById("sleepFormAreaVisibleButton");
+    sleepFormAreaVisibleButton.addEventListener('click', function() {showSleepFormArea()});
+    
+
+    function showSleepFormArea(){
+        //As the element only has 1 class, we can easily replace className for maximum backwards compatibility 
+        if(formHidden){
+            document.getElementById("sleepFormArea").className="d-block";
+            formHidden=false;
+            sleepFormAreaVisibleButton.textContent="Hide the sleep form";
+        }else{
+            document.getElementById("sleepFormArea").className="d-none";
+            formHidden=true;
+            sleepFormAreaVisibleButton.textContent="Add a night's sleep";
+        }
+    }
 </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-</html>
+    </html>

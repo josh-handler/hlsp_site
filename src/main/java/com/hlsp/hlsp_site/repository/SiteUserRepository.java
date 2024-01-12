@@ -1,6 +1,7 @@
 package com.hlsp.hlsp_site.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -10,6 +11,8 @@ import com.hlsp.hlsp_site.model.SiteUser;
 
 @Repository
 public interface SiteUserRepository extends CrudRepository<SiteUser, Integer> {
+
+    // Optional<SiteUser> findUserByEmailAddress(String emailAddress); 
 
     @Query("SELECT user FROM SiteUser user WHERE user.emailAddress = :emailAddress AND user.passwordHash = :passwordHash")
     List<SiteUser> logInAsUser(String emailAddress, byte[] passwordHash);
