@@ -15,6 +15,64 @@
             <div th:replace="~{fragments/navbarfragment :: navbarIn}"></div>
         </th:block>
     </th:block>
+
+    <h2 class="text-center">My Meal Data</h2>
+    <button id="sleepFormAreaVisibleButton">Add a night's sleep</button>
+    <div id="sleepFormArea" class="d-none">
+        <div class="d-flex justify-content-center mb-3">
+            <div></div>
+            <form id="sleepPostForm" class="col-6" action="/sleepForm" method="post">
+                <div class="row mb-1">
+                    <div class="col-6 d-flex justify-content-end">
+                        <label class="me-2" for="date">Date </label><br>
+                        <input id="formDate" required type ="date" name="date" title="Date">
+                    </div>
+                </div>
+                <div class="row mb-1">
+                    <div class="col d-flex justify-content-end">
+                        <label class="me-2" for="toBed">Went to bed at</label>
+                        <input id="formToBed" required type ="time" name="toBed" title="Went to bed">
+                    </div>
+                    <div class="col d-flex justify-content-end">
+                        <label class="me-2" for="toSleep">Fell Asleep at (Optional)</label>
+                        <input id="formToSleep" type ="time" name="toSleep" title="Fell Asleep">
+                        </div>
+                </div>
+                <div class="row mb-1">
+                    <div class="col d-flex justify-content-end">
+                        <label class="me-2" for="gotUp">Got out of bed at</label>
+                        <input id="formGotUp" type ="time" name="gotUp" title="Got out of bed">
+                    </div>
+                    <div class="col d-flex justify-content-end">
+                        <label class="me-2" for="wokeUp">Woke Up at (Optional)</label>
+                        <input id="formWokeUp" type ="time" name="wokeUp" title="Woke Up">
+                    </div> 
+                </div>
+                <div class="d-flex mt-1 justify-content-end">
+                    <button class="btn btn-warning" type="submit">Submit</button>
+                </div>
+            </form>
+            <div></div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-center mb-3">
+        <div></div>
+        <div id="mealInfoArea" class="table-responsive">
+                <table class="table table-bordered" id="mealTable">
+                <thead id="mealTableHead">
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Meal Type</th>
+                        <th scope="col">Portions</th>
+                    </tr>
+                </thead>
+                <tbody id="mealTableBody">
+                </tbody>
+            </table>
+        </div>
+        <div></div>
+    </div>
+
 </body>
 <script>
 </script>

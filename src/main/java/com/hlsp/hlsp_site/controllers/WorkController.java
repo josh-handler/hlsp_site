@@ -2,6 +2,7 @@ package com.hlsp.hlsp_site.controllers;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -27,6 +28,9 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 public class WorkController{
    
+    private static final List<String> stressLevelOptions = 
+    Arrays.asList("Very Low", "Low", "Medium", "High", "Very High");
+
     @Autowired SiteUserRepository siteUserRepository;
     @Autowired WorkEventRepository workEventRepository; 
 
@@ -42,7 +46,7 @@ public class WorkController{
         }
         model.addAttribute("loginStatus", loginStatus);
         model.addAttribute("displayName", displayName);
-        
+
         return "work";
     }
 
@@ -79,6 +83,11 @@ public class WorkController{
         UserDTO userDto = (UserDTO) session.getAttribute("user");
 
         if(userDto==null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+
+        if(!stressLevelOptions.contains(workEventDto.getStressLevel())){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
