@@ -31,8 +31,8 @@ public class SiteUser{
         this.salt = salt;
     }
 
-    public User toUser(){
-        return new User(userId,emailAddress,firstName,lastName, displayName);
+    public UserDTO toUser(){
+        return new UserDTO(userId,emailAddress,firstName,lastName, displayName);
     }
 
     public byte[] getSalt() {

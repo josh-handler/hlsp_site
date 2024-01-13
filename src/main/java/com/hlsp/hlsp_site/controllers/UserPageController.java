@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.hlsp.hlsp_site.model.SiteUser;
-import com.hlsp.hlsp_site.model.User;
+import com.hlsp.hlsp_site.model.UserDTO;
 import com.hlsp.hlsp_site.repository.SiteUserRepository;
 
 import jakarta.servlet.http.HttpSession;
@@ -26,10 +26,10 @@ public class UserPageController {
     @CookieValue(name="displayName", defaultValue="") String displayName,
     Model model, HttpSession session){
 
-        User userDto = (User) session.getAttribute("user");
+        UserDTO userDto = (UserDTO) session.getAttribute("user");
 
         if(userDto==null){
-            model.addAttribute("loginStatus", loginStatus);
+            model.addAttribute("loginStatus", "out");
             return "login";
         }
         //Somewhat legacy, will redo with thymeleaf using cookies to get this if logged in.

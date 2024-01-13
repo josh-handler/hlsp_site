@@ -44,7 +44,7 @@ public class SleepEvent {
     Date gotUpTime;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "siteUser_Id", nullable = true)
+    @JoinColumn(name = "siteUser_Id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private SiteUser siteUser;
@@ -53,10 +53,9 @@ public class SleepEvent {
 
     }
 
-    public SleepEvent(SleepEventDTO dto, SiteUser user){
+    public SleepEvent(SleepEventDTO dto, SiteUser user) throws ParseException{
         DateFormat eventDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         DateFormat timeDateFormat = new SimpleDateFormat("kk:mm");
-        try{
         this.sleepEventDate = eventDateFormat.parse(dto.getSleepEventDate());
         this.toBedTime = timeDateFormat.parse(dto.getToBedTime());
         this.gotUpTime = timeDateFormat.parse(dto.getGotUpTime());
@@ -65,10 +64,6 @@ public class SleepEvent {
             }
         if(!dto.getWokeUpTime().isEmpty()){
         this.wokeUpTime = timeDateFormat.parse(dto.getWokeUpTime());
-            }
-        }
-        catch(ParseException exception){
-            System.out.println(exception.getMessage());
         }
         siteUser=user;
     }
@@ -138,27 +133,22 @@ public class SleepEvent {
     //In theory we could remove 3 of the checks and still be safe. However, this gaurds against unexpected nulls from the database which stymied development for some time.
     public SleepEventDTO createDto(){
         DateFormat eventDateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        DateFormat timeDateFormat = new SimpleDateFormat("kk:mm");
+        DateFormat timeFormat = new SimpleDateFormat("kk:mm");
         SleepEventDTO sleepDto = new SleepEventDTO();
-        System.out.println(sleepEventDate);
         if(sleepEventDate!=null){
             sleepDto.setSleepEventDate(eventDateFormat.format(sleepEventDate));
-            System.out.println(eventDateFormat.format(sleepEventDate));
-            System.out.println(sleepDto.getSleepEventDate());
-
-
         }
         if(toBedTime!=null){
-            sleepDto.setToBedTime(timeDateFormat.format(toBedTime));
+            sleepDto.setToBedTime(timeFormat.format(toBedTime));
         }
         if(gotUpTime!=null){
-            sleepDto.setGotUpTime(timeDateFormat.format(gotUpTime));
+            sleepDto.setGotUpTime(timeFormat.format(gotUpTime));
         }
         if(fellAsleepTime!=null){
-            sleepDto.setFellAsleepTime(timeDateFormat.format(fellAsleepTime));
+            sleepDto.setFellAsleepTime(timeFormat.format(fellAsleepTime));
         }
         if(wokeUpTime!=null){
-            sleepDto.setWokeUpTime(timeDateFormat.format(wokeUpTime));
+            sleepDto.setWokeUpTime(timeFormat.format(wokeUpTime));
         }
         return sleepDto;
     }

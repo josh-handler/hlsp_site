@@ -5,7 +5,7 @@ import java.io.Serializable;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class User implements Serializable {
+public class UserDTO implements Serializable {
     private int userID;
     private String email;
     private String firstName;
@@ -52,16 +52,16 @@ public class User implements Serializable {
         this.lastName = lastName;
     }
 
-    public User(){
+    public UserDTO(){
         // userName="";
         // firstName="";
     }
 
-    public User(String email){
+    public UserDTO(String email){
         this.email=email;
     }
 
-    public User(int userId, String email, String firstName, String lastName, String displayName){
+    public UserDTO(int userId, String email, String firstName, String lastName, String displayName){
         this.userID=userId;
         this.email=email;
         this.firstName=firstName;
@@ -69,7 +69,7 @@ public class User implements Serializable {
         this.displayName=displayName;
     }
 
-    public User userBean(int userId, String email, String firstName, String lastName, String displayName){
-        return new User(userId, email, firstName, lastName, displayName);
+    public UserDTO userBean(int userId, String email, String firstName, String lastName, String displayName){
+        return new UserDTO(userId, email, firstName, lastName, displayName);
     }
 }

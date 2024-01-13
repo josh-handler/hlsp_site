@@ -1,5 +1,6 @@
 package com.hlsp.hlsp_site.controllers;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.hlsp.hlsp_site.model.SiteUser;
 import com.hlsp.hlsp_site.model.SleepEvent;
 import com.hlsp.hlsp_site.model.SleepEventDTO;
-import com.hlsp.hlsp_site.model.User;
+import com.hlsp.hlsp_site.model.UserDTO;
 import com.hlsp.hlsp_site.repository.SiteUserRepository;
 import com.hlsp.hlsp_site.repository.SleepEventRepository;
 
@@ -36,13 +37,11 @@ public class SleepController {
         @CookieValue(name="displayName", defaultValue="") String displayName,Model model,
         HttpSession session){
 
-        User userDto = (User) session.getAttribute("user");
-
+        UserDTO userDto = (UserDTO) session.getAttribute("user");
         if(userDto==null){
             model.addAttribute("loginStatus", "out");
             return "login";
         }
-
         model.addAttribute("loginStatus", loginStatus);
         model.addAttribute("displayName", displayName);
         return "sleep";
@@ -50,7 +49,7 @@ public class SleepController {
 
     @GetMapping("/sleepTable")
     public ResponseEntity<List<SleepEventDTO>> getSleepTable(HttpSession session){
-        User userDto = (User) session.getAttribute("user");
+        UserDTO userDto = (UserDTO) session.getAttribute("user");
 
         if(userDto==null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -80,7 +79,7 @@ public class SleepController {
 
         //Not sure why we would create a new sleepevent to save when we have an existing one
         //I think it might be for the @GeneratedValue field?
-        User userDto = (User) session.getAttribute("user");
+        UserDTO userDto = (UserDTO) session.getAttribute("user");
 
         if(userDto==null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -94,12 +93,17 @@ public class SleepController {
         if(userList.size() > 1){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        SleepEvent receivedSleepEvent = new SleepEvent(sleepEventdto, userList.get(0));
+        try{
+            SleepEvent receivedSleepEvent = new SleepEvent(sleepEventdto, userList.get(0));
 
-        SleepEvent createdSleepEvent = sleepEventRepository.save(receivedSleepEvent);
+            SleepEvent createdSleepEvent = sleepEventRepository.save(receivedSleepEvent);
+    
+            //This does not sort the new data into the correct row of the table on the client side
+            //but this is a compromise for users knowing the data is in without additional work.
+            return new ResponseEntity<SleepEventDTO>(createdSleepEvent.createDto(), HttpStatus.CREATED);
+        }catch(ParseException exception){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
+        }
 
-        //This does not sort the new data into the correct row of the table on the client side
-        //but this is a compromise for users knowing the data is in without additional work.
-        return new ResponseEntity<>(createdSleepEvent.createDto(), HttpStatus.CREATED);
      }
 }

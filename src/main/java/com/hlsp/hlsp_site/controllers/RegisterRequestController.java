@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.hlsp.hlsp_site.model.SiteUser;
-import com.hlsp.hlsp_site.model.User;
+import com.hlsp.hlsp_site.model.UserDTO;
 import com.hlsp.hlsp_site.repository.SiteUserRepository;
 import com.hlsp.hlsp_site.support.CustomPasswordEncoder;
 
@@ -58,7 +58,7 @@ public class RegisterRequestController {
 
         siteUserRepository.save(siteUserToRegister);
 
-        User user = siteUserToRegister.toUser();
+        UserDTO user = siteUserToRegister.toUser();
 
         Cookie emailCookie = new Cookie("email", user.getEmail());
             emailCookie.setPath("/");

@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head> 
     <title>Your Work</title> 
     <meta charset="utf-8">
@@ -15,8 +15,151 @@
             <div th:replace="~{fragments/navbarfragment :: navbarIn}"></div>
         </th:block>
     </th:block>
+
+    <h2 class="text-center">My Work Data</h2>
+    <button id="workFormAreaVisibleButton">Add a day's work</button>
+    <div id="workFormArea" class="d-none">
+        <div class="d-flex justify-content-center mb-3">
+            <div></div>
+            <form id="workPostForm" class="col-6" action="/workForm" method="post">
+                <div class="row mb-1">
+                    <div class="col-6 d-flex justify-content-end">
+                        <label class="me-2" for="date">Date </label><br>
+                        <input id="formDate" required type ="date" name="date" title="Date">
+                    </div>
+                    <div class="col d-flex justify-content-end">
+                        <label class="me-2" for="stress">Stress Level</label>
+                        <select id="formStress" required type ="optionset" name="stress" title="">
+                            <option value="Very Low">Very Low</option>
+                            <option value="Low">Low</option>
+                            <option value="Medium" selected="true">Medium</option>
+                            <option value="High">High</option>
+                            <option value="Very High">Very High</option>
+                        </select>
+                    </div> 
+                </div>
+                <div class="row mb-1">
+                    <div class="col d-flex justify-content-end">
+                        <label class="me-2" for="toBed">Started Work at</label>
+                        <input id="formWorkStart" required type ="time" name="workStart" title="Started Work">
+                    </div>
+                    <div class="col d-flex justify-content-end">
+                        <label class="me-2" for="toSleep">Finished Work at</label>
+                        <input id="formWorkEnd" required type ="time" name="workEnd" title="Finished Work">
+                        </div>
+                </div>
+                <div class="row mb-1">
+                    <!-- <div class="col d-flex justify-content-end">
+                        <label class="me-2">Worked for hours</label>
+                    </div> -->
+                <div class="d-flex mt-1 justify-content-end">
+                    <button class="btn btn-warning" type="submit">Submit</button>
+                </div>
+            </form>
+            <div></div>
+        </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-center mb-3">
+        <div></div>
+        <div id="workInfoArea" class="table-responsive">
+                <table class="table table-bordered" id="work">
+                <thead id="workTableHead">
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Started Work</th>
+                        <th scope="col">Finished Work</th>
+                        <!-- <th scope="col">Time Worked</th> -->
+                        <th scope="col">Stress Level</th>
+                    </tr>
+                </thead>
+                <tbody id="workTableBody">
+                </tbody>
+            </table>
+        </div>
+        <div></div>
+    </div>
+
 </body>
 <script>
+        const workPostForm = document.getElementById('workPostForm');
+
+        const workTable= document.getElementById('workTableBody');
+
+        const todaysDate = new Date().toISOString().substr(0, 10);
+        document.getElementById("formDate").setAttribute("value",todaysDate);
+
+        var formHidden = true;
+
+        function addToWorkTable(workEvent){
+            let newRow = workTable.insertRow(0)
+            newRow.innerHTML = `
+            <tr>
+                <th scope="row">${workEvent.eventDate}</th>
+                <td>${workEvent.eventStart}</td>
+                <td>${workEvent.eventEnd}</td>
+                <td>${workEvent.stressLevel}</td>
+            </tr>
+            `
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+        var responseAsJson;
+        fetch('workTable').then( response => response.json())
+        .then(workEventData => {
+                for(let i in workEventData){
+                    addToWorkTable(workEventData[i]);
+                }
+            }
+        )
+        })
+
+    workPostForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        let workDateInput = document.getElementById("formDate");
+        let workStartInput = document.getElementById("formWorkStart");
+        let workEndInput = document.getElementById("formWorkEnd");
+        let workStressInput = document.getElementById("formStress");
+
+        fetch('workForm',{
+            method: 'POST',
+            body: JSON.stringify({
+                eventDate: workDateInput.value,
+                eventStart: workStartInput.value,
+                eventEnd: workEndInput.value,
+                stressLevel: workStressInput.value
+            }),
+            headers: {'Content-Type': 'application/json'}
+        })
+        .then(response => response.json())
+        .then(workEvent => {
+            addToWorkTable(workEvent);
+            workDateInput.value=todaysDate;
+            workStartInput.value="";
+            workEndInput.value="";
+            workStressInput.value="Medium";
+        })
+    });
+
+    //Add eventlistener to allow a button to trigger the showworkFormArea event
+    const workFormAreaVisibleButton = document.getElementById("workFormAreaVisibleButton");
+    workFormAreaVisibleButton.addEventListener('click', function() {showWorkFormArea()});
+    
+
+    function showWorkFormArea(){
+        //As the element only has 1 class, we can easily replace className for maximum backwards compatibility 
+        if(formHidden){
+            document.getElementById("workFormArea").className="d-block";
+            formHidden=false;
+            workFormAreaVisibleButton.textContent="Hide the work form";
+        }else{
+            document.getElementById("workFormArea").className="d-none";
+            formHidden=true;
+            workFormAreaVisibleButton.textContent="Add a day's work";
+        }
+    }
+
 </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </html>

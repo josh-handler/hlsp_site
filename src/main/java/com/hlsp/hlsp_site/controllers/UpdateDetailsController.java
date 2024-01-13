@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.hlsp.hlsp_site.model.SiteUser;
-import com.hlsp.hlsp_site.model.User;
+import com.hlsp.hlsp_site.model.UserDTO;
 import com.hlsp.hlsp_site.repository.SiteUserRepository;
 
 import jakarta.servlet.http.Cookie;
@@ -32,7 +32,7 @@ public class UpdateDetailsController {
     @RequestParam(name="lastNameForm", required=true) String lastName,
     @RequestParam(name="displayNameForm", required=true) String displayName){
         
-        User userDto = (User) session.getAttribute("user");
+        UserDTO userDto = (UserDTO) session.getAttribute("user");
 
         if(userDto==null){
             model.addAttribute("loginStatus", "out");

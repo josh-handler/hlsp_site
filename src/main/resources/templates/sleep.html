@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head> 
     <title>Your Sleep</title> 
     <meta charset="utf-8">
@@ -58,7 +58,7 @@
         <div></div>
         <div id="sleepInfoArea" class="table-responsive">
                 <table class="table table-bordered" id="sleepTable">
-                <thead>
+                <thead id="sleepTableHead">
                     <tr>
                         <th scope="col">Date</th>
                         <th scope="col">Went to bed</th>
@@ -75,8 +75,11 @@
     </div>
 </body>
 <script>
-    document.getElementById("formDate").setAttribute("value",new Date().toISOString().substr(0, 10))
+    const todaysDate = new Date().toISOString().substr(0, 10);
+    document.getElementById("formDate").setAttribute("value",todaysDate);
     
+    const sleepTable = document.getElementById('sleepTableBody');
+
     function addToSleepTable(sleepEvent){
         let sleepTime = "";
         if(sleepEvent.fellAsleepTime!== null){
@@ -86,7 +89,7 @@
         if(sleepEvent.wokeUpTime!== null){
             upTime=sleepEvent.wokeUpTime;
         }
-            let newRow = sleepTable.insertRow(1)
+            let newRow = sleepTable.insertRow(0)
             newRow.innerHTML = `
             <tr>
                 <th scope="row">${sleepEvent.sleepEventDate}</th>
@@ -99,9 +102,7 @@
         }
         
     document.addEventListener('DOMContentLoaded', function() {
-   // everything else we type will go inside this!!  
         var responseAsJson;
-        const sleepTable = document.getElementById('sleepTableBody');
         fetch('sleepTable').then( response => response.json())
         .then(sleepEventData => {
                 for(let i in sleepEventData){
@@ -118,26 +119,31 @@
     sleepPostForm.addEventListener('submit', (event) => {
         event.preventDefault()
 
-        let sleepDateInput = document.getElementById('formDate').value
-        let toBedInput = document.getElementById('formToBed').value
-        let toSleepInput = document.getElementById('formToSleep').value
-        let gotUpInput = document.getElementById('formGotUp').value
-        let wokeUpInput = document.getElementById('formWokeUp').value
+        let sleepDateInput = document.getElementById('formDate');
+        let toBedInput = document.getElementById('formToBed');
+        let toSleepInput = document.getElementById('formToSleep');
+        let gotUpInput = document.getElementById('formGotUp');
+        let wokeUpInput = document.getElementById('formWokeUp');
 
         fetch('/sleepForm',{
             method: 'POST',
             body: JSON.stringify({
-                    sleepEventDate: sleepDateInput,
-                    toBedTime: toBedInput,
-                    fellAsleepTime: toSleepInput,
-                    wokeUpTime: wokeUpInput,
-                    gotUpTime: gotUpInput
+                    sleepEventDate: sleepDateInput.value,
+                    toBedTime: toBedInput.value,
+                    fellAsleepTime: toSleepInput.value,
+                    wokeUpTime: wokeUpInput.value,
+                    gotUpTime: gotUpInput.value
                 }),
             headers: {'Content-Type': 'application/json'}
         })
         .then(response => response.json())
         .then(sleepEvent => {
             addToSleepTable(sleepEvent)
+            sleepDateInput.value=todaysDate;
+            toBedInput.value="";
+            toSleepInput.value="";
+            gotUpInput.value="";
+            wokeUpInput.value="";
         });
     });
 

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.hlsp.hlsp_site.model.SiteUser;
-import com.hlsp.hlsp_site.model.User;
+import com.hlsp.hlsp_site.model.UserDTO;
 import com.hlsp.hlsp_site.repository.SiteUserRepository;
 import com.hlsp.hlsp_site.support.CustomPasswordEncoder;
 
@@ -42,7 +42,7 @@ public class LoginRequestController {
 
         Map<String, Object> model = new HashMap<>();
         if(validLoginDataStructure(email,password)){
-            User user = null;
+            UserDTO user = null;
             try{
                 user = loginAttempt(email, password);
             }
@@ -78,7 +78,7 @@ public class LoginRequestController {
         return new ModelAndView(INVALID_DATA_VIEW_NAME, model);
     }
 
-    public User loginAttempt(String userName, String password) throws SQLException, NoSuchAlgorithmException
+    public UserDTO loginAttempt(String userName, String password) throws SQLException, NoSuchAlgorithmException
     {
             // SecureRandom saltShaker = new SecureRandom();
             // byte[] salt = new byte[16];
@@ -109,7 +109,7 @@ public class LoginRequestController {
 
         }
         
-        User foundUser = resultSetSiteUsers.get(0).toUser();
+        UserDTO foundUser = resultSetSiteUsers.get(0).toUser();
 
         return foundUser;
     }
