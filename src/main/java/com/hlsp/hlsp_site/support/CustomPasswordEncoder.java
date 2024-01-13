@@ -4,14 +4,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.web.servlet.ModelAndView;
 
 public class CustomPasswordEncoder{
 
