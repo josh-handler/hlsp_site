@@ -17,36 +17,31 @@
     </th:block>
 
     <h2 class="text-center">My Meal Data</h2>
-    <button id="sleepFormAreaVisibleButton">Add a night's sleep</button>
-    <div id="sleepFormArea" class="d-none">
+    <button id="mealsFormAreaVisibleButton">Add a meal</button>
+    <div id="mealsFormArea" class="d-none">
         <div class="d-flex justify-content-center mb-3">
             <div></div>
-            <form id="sleepPostForm" class="col-6" action="/sleepForm" method="post">
+            <form id="mealsPostForm" class="col-6" action="/mealsForm" method="post">
                 <div class="row mb-1">
                     <div class="col-6 d-flex justify-content-end">
-                        <label class="me-2" for="date">Date </label><br>
-                        <input id="formDate" required type ="date" name="date" title="Date">
+                        <label class="me-2" for="date">Meal on: </label><br>
+                        <input id="formDate" required type ="datetime-local" name="date" title="Date">
+                    </div>
+                    <div class="col d-flex justify-content-end">
+                        <label class="me-2" for="mealType">Meal Type: </label>
+                        <select id="formType" required type ="optionset" name="mealType" title="Meal Type">
+                            <option value="Breakfast">Breakfast</option>
+                            <option value="Lunch">Lunch</option>
+                            <option value="Supper">Supper</option>
+                            <option value="Snack">Snack</option>
+                            <option value="Other">Other</option>
+                        </select>
                     </div>
                 </div>
-                <div class="row mb-1">
-                    <div class="col d-flex justify-content-end">
-                        <label class="me-2" for="toBed">Went to bed at</label>
-                        <input id="formToBed" required type ="time" name="toBed" title="Went to bed">
-                    </div>
-                    <div class="col d-flex justify-content-end">
-                        <label class="me-2" for="toSleep">Fell Asleep at (Optional)</label>
-                        <input id="formToSleep" type ="time" name="toSleep" title="Fell Asleep">
-                        </div>
+                <div class="d-flex justify-content-end mb-1">
+                    <button class="btn btn-warning" type="button" id="addFoodButton">Add Food</button>
                 </div>
-                <div class="row mb-1">
-                    <div class="col d-flex justify-content-end">
-                        <label class="me-2" for="gotUp">Got out of bed at</label>
-                        <input id="formGotUp" type ="time" name="gotUp" title="Got out of bed">
-                    </div>
-                    <div class="col d-flex justify-content-end">
-                        <label class="me-2" for="wokeUp">Woke Up at (Optional)</label>
-                        <input id="formWokeUp" type ="time" name="wokeUp" title="Woke Up">
-                    </div> 
+                <div id="addedPortionsArea">
                 </div>
                 <div class="d-flex mt-1 justify-content-end">
                     <button class="btn btn-warning" type="submit">Submit</button>
@@ -56,25 +51,157 @@
         </div>
     </div>
     <div class="d-flex justify-content-center mb-3">
-        <div></div>
+        <div class="minw-12p5"></div>
         <div id="mealInfoArea" class="table-responsive">
                 <table class="table table-bordered" id="mealTable">
                 <thead id="mealTableHead">
                     <tr>
                         <th scope="col">Date</th>
                         <th scope="col">Meal Type</th>
-                        <th scope="col">Portions</th>
+                        <th scope="col">Food Eaten</th>
                     </tr>
                 </thead>
                 <tbody id="mealTableBody">
                 </tbody>
             </table>
         </div>
-        <div></div>
+        <div class="minw-12p5"></div>
     </div>
 
 </body>
 <script>
+    const todaysDate = new Date().toISOString().substr(0, 16);
+    document.getElementById("formDate").setAttribute("value",todaysDate);
+    
+    const mealTable = document.getElementById('mealTableBody');
+
+    function addToMealTable(meal){
+            let newRow = mealTable.insertRow(0);
+            let portionText = "";
+
+            for(let i in meal.eatenPortions){
+                portionText +=`
+            <li>${meal.eatenPortions[i].portionsEaten} portion(s) of ${meal.eatenPortions[i].food}</li>
+            `;
+            }
+
+            newRow.innerHTML = `
+            <tr>
+                <th scope="row">${meal.mealDate}</th>
+                <td>${meal.mealType}</td>
+                <td>
+                    <ul>
+                        ${portionText}
+                    </ul>
+                </td>
+            </tr>
+            `
+        }
+        
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('mealsTable').then( response => response.json())
+        .then(mealsData => {
+                for(let i in mealsData){
+                    addToMealTable(mealsData[i]);
+                }
+            }
+        )
+    })
+    
+
+    var formHidden = true;
+
+    const mealsPostForm = document.getElementById('mealsPostForm');
+    mealsPostForm.addEventListener('submit', (event) => {
+        event.preventDefault()
+
+        let bodyString = JSON.stringify({
+            mealDate: document.getElementById("formDate").value,
+            mealType: document.getElementById("formType").value
+        });
+        let foodHolder = "";
+        let portionHolder = "";
+
+
+        if(portionsRemaining > 0){
+            for(let i = 0; i < portionsAdded; i++){
+                try {
+                foodHolder = document.getElementById(`formFood${i}`).value;
+                portionHolder = document.getElementById(`formPortions${i}`).value;
+                bodyString +=
+                `,portion:{
+                    food: ${foodHolder.value},
+                    portionsEaten: ${portionHolder.value}
+                }
+                `;
+                } catch (error) {
+                    console.log("no food in iteration " + i);
+                    console.log(error)
+                }
+            }
+        }
+        
+        fetch('/mealsForm',{
+            method: 'POST',
+            body: bodyString,
+            headers: {'Content-Type': 'application/json'}
+        })
+        .then(response => response.json())
+        .then(meal => {
+            addToMealTable(meal);
+            mealsPostForm.reset();
+            addedPortionsArea.innerHTML = "";
+        });
+    });
+
+    //Add eventlistener to allow a button to trigger the showMealsFormArea event
+    const mealsFormAreaVisibleButton = document.getElementById("mealsFormAreaVisibleButton");
+    mealsFormAreaVisibleButton.addEventListener('click', function() {showMealsFormArea()});
+    function showMealsFormArea(){
+        //As the element only has 1 class, we can easily replace className for maximum backwards compatibility 
+        if(formHidden){
+            document.getElementById("mealsFormArea").className="d-block";
+            formHidden=false;
+            mealsFormAreaVisibleButton.textContent="Hide the meals form";
+        }else{
+            document.getElementById("mealsFormArea").className="d-none";
+            formHidden=true;
+            mealsFormAreaVisibleButton.textContent="Add a meal";
+        }
+    }
+
+    let portionsAdded=0;
+    let portionsRemaining=0;
+    const addedPortionsArea = document.getElementById("addedPortionsArea");
+    //Add eventlistener to allow adding portions to the meal form
+    const addFoodButton = document.getElementById("addFoodButton");
+    addFoodButton.addEventListener('click', function() {addPortionToMealForm()});
+
+    function addPortionToMealForm(){
+        let newRow = document.createElement("div");
+        newRow.innerHTML = `
+        <div class="row mb-1" id="portion${portionsAdded}">
+            <div class="col d-flex justify-content-end">
+                <label class="me-2" for="mealFood">Food: </label><br>
+                <input type="text" id="formFood${portionsAdded}" required name="mealFood${portionsAdded}" title="Food">
+            </div>
+            <div class="col d-flex justify-content-end">
+                <label class="me-2" for="mealPortions">Portions: </label><br>
+                <input type="number" step="1" id="formPortions${portionsAdded}" required name="mealPortions${portionsAdded}" title="Portions">
+                <button type="button" onclick="deleteRow(this)" class="btn btn-warning">x</button>
+            </div>
+        </div>
+        `;
+        portionsAdded+=1;
+        portionsRemaining+=1;
+        addedPortionsArea.append(newRow);
+    }
+
+    function deleteRow(triggerElement){
+        triggerElement.parentElement.parentElement.remove();
+        portionsRemaining-=1;
+    }
+
 </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </html>

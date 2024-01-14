@@ -3,19 +3,11 @@ package com.hlsp.hlsp_site.model;
 import java.util.List;
 import java.util.UUID;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
 @Entity
@@ -32,11 +24,11 @@ public class Exercise {
     @Enumerated(EnumType.STRING)
     private Type type;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "siteUser_Id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnore
-    private SiteUser siteUser;
+    // @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    // @JoinColumn(name = "siteUser_Id", nullable = false)
+    // @OnDelete(action = OnDeleteAction.CASCADE)
+    // @JsonIgnore
+    // private SiteUser siteUser;
 
     @OneToMany(mappedBy = "exercise")
     private List<ExerciseSet> sets;
@@ -45,8 +37,15 @@ public class Exercise {
         this.exerciseGuid = exerciseGuid;
         this.name = name;
         this.type = type;
-        this.siteUser = siteUser;
+        // this.siteUser = siteUser;
         this.sets = sets;
+    }
+
+    public Exercise(String name, Type type) {
+        this.name = name;
+        this.type = type;
+        // this.siteUser = siteUser;
+        // this.sets = sets;
     }
 
     public Exercise() {
@@ -76,13 +75,13 @@ public class Exercise {
         this.type = type;
     }
 
-    public SiteUser getSiteUser() {
-        return siteUser;
-    }
+    // public SiteUser getSiteUser() {
+    //     return siteUser;
+    // }
 
-    public void setSiteUser(SiteUser siteUser) {
-        this.siteUser = siteUser;
-    }
+    // public void setSiteUser(SiteUser siteUser) {
+    //     this.siteUser = siteUser;
+    // }
 
     public List<ExerciseSet> getSets() {
         return sets;

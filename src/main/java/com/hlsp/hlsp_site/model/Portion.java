@@ -23,6 +23,15 @@ public class Portion{
 
     private Integer portionsEaten;
 
+    public Portion(PortionDTO dto){
+        this.food = dto.getFood();
+        this.portionsEaten = dto.getPortionsEaten();
+    }
+
+    public PortionDTO createDto(){
+        return new PortionDTO(this.getFood(), this.getPortionsEaten());
+    }
+
     public Portion(UUID portionGuid, Meal meal, String food, Integer portionsEaten) {
         this.portionGuid = portionGuid;
         this.meal = meal;

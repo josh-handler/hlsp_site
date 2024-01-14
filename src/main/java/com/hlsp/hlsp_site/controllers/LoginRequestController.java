@@ -33,7 +33,7 @@ public class LoginRequestController {
     // public static final String LOGIN_FAIL_VIEW_NAME = "loginFailureBadCredentialsOrSqlIssue";
     // public static final String INVALID_DATA_VIEW_NAME = "loginFailureInvalidData";
     public static final String LOGIN_SUCCESS_VIEW_NAME = "index";
-    public static final String LOGIN_FAIL_VIEW_NAME = "exception";
+    public static final String LOGIN_FAIL_VIEW_NAME = "login";
     public static final String INVALID_DATA_VIEW_NAME = "exception";
 
     @PostMapping("/loginRequest")
@@ -41,6 +41,7 @@ public class LoginRequestController {
     @RequestParam(name="password", required=true) String password, HttpSession session, HttpServletResponse response){
 
         Map<String, Object> model = new HashMap<>();
+        model.put("loginStatus", "out");
         if(validLoginDataStructure(email,password)){
             UserDTO user = null;
             try{
@@ -74,7 +75,7 @@ public class LoginRequestController {
             return new ModelAndView("redirect:/" + LOGIN_SUCCESS_VIEW_NAME, model);
             }
         }
-        
+        model.put("loginStatus", "out");
         return new ModelAndView(INVALID_DATA_VIEW_NAME, model);
     }
 

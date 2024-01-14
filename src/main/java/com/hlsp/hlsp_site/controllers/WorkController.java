@@ -68,6 +68,7 @@ public class WorkController{
 
         // This sorts the work events. First by date, then by time time of event start
         // Users thus have a (more) consistent experience of the data
+        //TODO if time allows: Move to sorting WorkEvents by Date earlier on, as this is a string sort
         workEventDtos.sort(
             Comparator.comparing(WorkEventDTO::getEventDate)
             .thenComparing(WorkEventDTO::getEventStart));
